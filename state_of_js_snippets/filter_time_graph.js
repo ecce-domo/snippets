@@ -16,6 +16,10 @@ const mobileDesktopNodes = children.filter(node => mobileAndDesktop.includes(nod
 const buildNodes = children.filter(node => buildTools.includes(node.querySelector('text')?.innerHTML))
 const monorepoNodes = children.filter(node => monorepoTools.includes(node.querySelector('text')?.innerHTML))
 
+const nodeSets = [ frontEndNodes, metaNodes, testingNodes, mobileDesktopNodes, buildNodes, monorepoNodes ];
+let intervalId = null;
+const demoInterval = 2000;
+
 /*
   The actually interesting task would be also hiding trend lines, but that's done
   in canvas, so I'd have to dig into that repo.
@@ -40,9 +44,26 @@ const reset = allNodes => {
     allNodes.forEach(node => Array.from(node.children).forEach(i => i.style.display = ''));
 }
 
+const demo = () => {
+  let index = 0;
+  const increment = () => index = (index + 1) % nodeSets.length;
+
+  intervalId = setInterval(
+    () => {
+      reset(children);
+      displayOnlySome(children, nodeSets[index]);
+      increment();
+    }, demoInterval
+  )
+}
+
+const killDemo = () => {
+  intervalId && clearInterval(intervalId);
+}
+
 /*
  * un-comment any of the following lines to see the titles of only that category
-*/
+ */
 // displayOnlySome(children, frontEndNodes);
 // displayOnlySome(children, metaNodes);
 // displayOnlySome(children, testingNodes);
@@ -50,4 +71,17 @@ const reset = allNodes => {
 // displayOnlySome(children, buildNodes);
 // displayOnlySome(children, monorepoNodes);
 
+/*
+ * run this to return to default (display everything again)
+ */
 // reset(children);
+
+/*
+ * or run this to rotate through them automatically...
+ */
+// demo();
+
+/*
+ * ...then this to end the "demo"
+ */
+// killDemo();
