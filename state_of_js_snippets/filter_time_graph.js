@@ -17,26 +17,28 @@ const buildNodes = children.filter(node => buildTools.includes(node.querySelecto
 const monorepoNodes = children.filter(node => monorepoTools.includes(node.querySelector('text')?.innerHTML))
 
 /*
-  This is kind of tricky - you can either hide years and dots of all tech and
-  just show the titles, or keep all years (even for hidden tech). I'm just
-  cutting my losses and leaving it as is. The actually interesting task would
-  be also hiding trend lines, but that's done in canvas, so I'd have to dig into
-  that repo. Maybe someday...
+  The actually interesting task would be also hiding trend lines, but that's done
+  in canvas, so I'd have to dig into that repo.
+  Maybe someday...
 */
 
-// This will hide years of 'active' trends, too
 const displayOnlySome = (all, some) => {
-    all.forEach(node => node.style.display = 'none');
-    all.filter(node => some.includes(node)).forEach(node => node.style.display = '')
+    // take display:none off all nodes
+    reset(all);
+
+    all
+      .filter(node => !some.includes(node)) // select nodes _not_ in this category
+      .forEach(
+        node => Array // for each outsider trend group,
+          .from(node.children) // take the children of each <g>
+          .forEach(i => i.style.display = 'none') // and hide them
+      );
 }
 
-// This will not hide years of any trends (even 'inactive' ones)
-const displayOnlySome2 = (all, some) => {
-    all.forEach(node => Array.from(node.children).slice(0,2).forEach(i => i.style.display = 'none'));
-    all.filter(node => some.includes(node)).forEach(node => Array.from(node.children).slice(0,2).forEach(i => i.style.display = ''));
+const reset = allNodes => {
+    allNodes.forEach(node => node.style.display = '');
+    allNodes.forEach(node => Array.from(node.children).forEach(i => i.style.display = ''));
 }
-
-const reset = allNodes => allNodes.forEach(node => node.style.display = '');
 
 /*
  * un-comment any of the following lines to see the titles of only that category
